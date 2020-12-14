@@ -14,7 +14,7 @@ public:
 	virtual void RegisterCommands() override;
 
 public:
-	//ÃüÁîA
+	//ÃüÁî
 	TSharedPtr< FUICommandInfo > CommandA;
 	TSharedPtr< FUICommandInfo > CommandB;
 };

@@ -16,7 +16,10 @@ public:
 
 public:
 	TSharedPtr<class FUICommandList> PluginCommandList;
+	IConsoleCommand* DisplayTestCommand;
+	IConsoleCommand* DisplayUserSpecifiedWindow;//TODO
 public:
 	void CommandAAction();
 	void CommandBAction(FOnContentBrowserGetSelection GetSelectionDelegate);
+	void DisplayWindow();
 };

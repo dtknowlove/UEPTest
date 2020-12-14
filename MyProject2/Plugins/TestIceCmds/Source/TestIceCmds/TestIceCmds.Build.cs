@@ -26,6 +26,10 @@ public class TestIceCmds : ModuleRules
 			new string[]
 			{
 				"Core",
+				"MainFrame",
+				"AssetTools",
+				"AppFramework",
+				"PropertyEditor"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

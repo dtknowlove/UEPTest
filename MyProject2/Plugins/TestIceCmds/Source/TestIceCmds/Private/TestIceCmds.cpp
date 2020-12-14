@@ -6,6 +6,7 @@
 #include "LevelEditor.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Misc/MessageDialog.h"
+#include "Interfaces/IMainFrameModule.h"
 
 #define LOCTEXT_NAMESPACE "FTestIceCmdsModule"
 
@@ -53,6 +54,10 @@ void FTestIceCmdsModule::StartupModule()
 		}
 	));
 	LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(ToolbarExtender);
+
+	//添加运行时命令行
+	DisplayTestCommand = IConsoleManager::Get().RegisterConsoleCommand(TEXT("IceCmd_PrintStr"), TEXT("IceCmd"), FConsoleCommandDelegate::CreateRaw(this,&FTestIceCmdsModule::DisplayWindow), ECVF_Default);
+	
 }
 
 void FTestIceCmdsModule::ShutdownModule()
@@ -60,6 +65,12 @@ void FTestIceCmdsModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 	FTestCmds::Unregister();
+
+	if (DisplayTestCommand)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(DisplayTestCommand);
+		DisplayTestCommand = nullptr;
+	}
 }
 
 
@@ -82,6 +93,28 @@ void FTestIceCmdsModule::CommandBAction(FOnContentBrowserGetSelection GetSelecti
 		Message += ad.GetAsset()->GetName() + " ";
 	}
 	FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(Message));
+}
+
+void FTestIceCmdsModule::DisplayWindow()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Sucessed print by command"));
+
+	FString WindowTitle = FString(TEXT("Test Command Window"));
+	TSharedRef<SWindow> CookbookWindow = SNew(SWindow)
+		.Title(FText::FromString(WindowTitle))
+		.ClientSize(FVector2D(800,400))
+		.SupportsMaximize(false)
+		.SupportsMinimize(false);
+	IMainFrameModule& MainFrameModule = FModuleManager::LoadModuleChecked< IMainFrameModule>(TEXT("MainFrame"));
+	if (MainFrameModule.GetParentWindow().IsValid())
+	{
+		FSlateApplication::Get().AddWindowAsNativeChild(CookbookWindow, MainFrameModule.GetParentWindow().ToSharedRef());
+	}
+	else
+	{
+		FSlateApplication::Get().AddWindow(CookbookWindow);
+	}
+
 }
 
 #undef LOCTEXT_NAMESPACE
